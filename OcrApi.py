@@ -13,19 +13,21 @@ import logging
 import config
 
 
-def fetchApi(image_name=True):
+def fetchApi(image_name):
     pid = os.getpid()
     logging.basicConfig(filename='./logs/ocr_api.log',level=logging.DEBUG)
     logging.info('=== start ocrApi ===')
 
-    subscription_key = config.api_key
+    subscription_key = config.subscription_key
     endpoint = "https://optical-character-recognition.cognitiveservices.azure.com/"
 
     ocr_url = endpoint + "vision/v3.0/ocr"
 
     params = {'language': 'ja', 'detectOrientation': 'true'}
 
-    image_path = "/home/azureuser/fukuNode/out.png"
+    
+    path = "/home/azureuser/fukuNode/"
+    image_path = path + image_name
     # Read the image into a byte array
     image_data = open(image_path, "rb").read()
     # Set Content-Type to octet-stream
@@ -69,4 +71,4 @@ def fetchApi(image_name=True):
             return False
 
 if __name__ == "__main__":
-    fetchApi()
+    fetchApi(sys.argv[1])

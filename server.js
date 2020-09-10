@@ -8,13 +8,19 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json({ limit: '15MB' }))
 
 app.post('/', (req, res) => {
-    fs.writeFile('./out.png', req.body.imgsource, 'base64', (err) => {
+
+    var tmp = Date.now()
+    var png = '.png'
+    var fileName = tmp+png
+    console.log('File name : '+ fileName)
+
+    fs.writeFile(fileName, req.body.imgsource, 'base64', (err) => {
         if (err) throw err
     })
     res.status(200)
 
     var dataToSend;
-    const python = spawn('python3', ['./OcrApi.py']);
+    const python = spawn('python3', ['./OcrApi.py',fileName]);
     python.stdout.on('data',  (data) => {
         console.log('Pipe data from python script ...');
         console.log(data)
@@ -23,12 +29,19 @@ app.post('/', (req, res) => {
     });
 
     python.on('close', (code) => {
-         console.log('child process close all stdio with code $code');
-	 
-	 
-	 // send data to browser
-	 res.send(dataToSend)
+        console.log('child process close / return : '+dataToSend); 
+	// send data to browser
+	res.send(dataToSend)
+        setTimeout(() => {  console.log("waiting"); }, 5000);
+        var path = '/home/azureuser/fukuNode/'+fileName
+        fs.unlink(path, (err) => { 
+            if (err) {
+                console.error(err)
+	        return
+            }
+        })
     });
+
 
 })
 app.listen(5000)
