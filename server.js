@@ -34,12 +34,13 @@ app.post('/', (req, res) => {
 	res.send(dataToSend)
         setTimeout(() => {  console.log("waiting"); }, 5000);
         var path = '/home/azureuser/fukuNode/'+fileName
-        fs.unlink(path, (err) => { 
+	fs.unlink(path, (err) => { 
             if (err) {
                 console.error(err)
 	        return
             }
-        })
+	})
+        console.log("finished delete image file")
     });
 
 

@@ -19,45 +19,41 @@ def fetchApi(image_name):
     logging.info('=== start ocrApi ===')
 
     subscription_key = config.subscription_key
-    endpoint = "https://optical-character-recognition.cognitiveservices.azure.com/"
-
+    endpoint = config.endpoint
     ocr_url = endpoint + "vision/v3.0/ocr"
 
     params = {'language': 'ja', 'detectOrientation': 'true'}
 
-    
     path = "/home/azureuser/fukuNode/"
     image_path = path + image_name
-    # Read the image into a byte array
     image_data = open(image_path, "rb").read()
-    # Set Content-Type to octet-stream
+    logging.info(image_path)
+
     headers = {'Ocp-Apim-Subscription-Key': subscription_key, 'Content-Type': 'application/octet-stream'}
-    # put the byte array into your post request
     response = requests.post(ocr_url, headers=headers, params=params, data = image_data)
-
+    # logging.info(response.text)
     response.raise_for_status()
-
     analysis = response.json()
-
     # Extract the word bounding boxes and text.
     line_infos = [region["lines"] for region in analysis["regions"]]
     # print("===line_infos=== : ",line_infos)
-
+    logging.info('creating text')
     word_infos = []
-    tmp = "/home/azureuser/fuku/ocrApi/work/text."
+    tmp = "/home/azureuser/fukuNode/work/"
     text = tmp + str(pid)
+    logging.info(text)
     f = open(text, "w")
     for line in line_infos:
         for word_metadata in line:
             for word_info in word_metadata["words"]:
 
-                # print(word_info["text"])
+                # logging.info(word_info["text"])
                 f.write(word_info["text"])
 
     f.close()
-    f = open(text, "r")
-    tmp = f.read()
-    logging.info(tmp)
+    # f = open(text, "r")
+    # tmp = f.read()
+    logging.info('checking text')
     with open(text) as f:
         fuku = '福島'
         if fuku in f.read():
